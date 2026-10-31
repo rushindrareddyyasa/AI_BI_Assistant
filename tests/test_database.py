@@ -1,25 +1,28 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
-from database.database import save_data
+import database.database as database_module
 
 
-def test_save_data(tmp_path):
+def test_save_data(tmp_path, monkeypatch):
 
     database_path = tmp_path / "test.db"
-    engine = create_engine(f"sqlite:///{database_path}")
+    test_engine = create_engine(f"sqlite:///{database_path}")
+
+    # Replace the application engine with the temporary test engine
+    monkeypatch.setattr(database_module, "engine", test_engine)
 
     data = pd.DataFrame({
         "Product": ["Laptop", "Mouse"],
         "Quantity": [2, 3]
     })
 
-    save_data(data, "sales", engine=engine)
+    database_module.save_data(data, "sales")
 
-    result = pd.read_sql("SELECT * FROM sales", engine)
+    result = pd.read_sql("SELECT * FROM sales", test_engine)
 
     assert len(result) == 2
     assert list(result.columns) == ["Product", "Quantity"]
     assert result.iloc[0]["Product"] == "Laptop"
 
-    engine.dispose()
+    test_engine.dispose()
