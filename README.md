@@ -59,7 +59,3 @@ AI_BI_Assistent/
 └── README.md
 ```
 
-
-
-
-This project was developed as part of a Graduate Engineer Trainee assessment.
