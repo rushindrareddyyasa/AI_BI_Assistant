@@ -1,10 +1,25 @@
-from ingestion.csv_reader import read_csv_file
-from ingestion.data_cleaner import clean_data
+import pandas as pd
+from sqlalchemy import create_engine
+
 from database.database import save_data
 
-data = read_csv_file("data/raw/sales.csv")
 
-cleaned_data, quarantined_data = clean_data(data)
+def test_save_data(tmp_path):
 
-save_data(cleaned_data, "sales")
-save_data(quarantined_data, "quarantined_sales")
+    database_path = tmp_path / "test.db"
+    engine = create_engine(f"sqlite:///{database_path}")
+
+    data = pd.DataFrame({
+        "Product": ["Laptop", "Mouse"],
+        "Quantity": [2, 3]
+    })
+
+    save_data(data, "sales", engine=engine)
+
+    result = pd.read_sql("SELECT * FROM sales", engine)
+
+    assert len(result) == 2
+    assert list(result.columns) == ["Product", "Quantity"]
+    assert result.iloc[0]["Product"] == "Laptop"
+
+    engine.dispose()

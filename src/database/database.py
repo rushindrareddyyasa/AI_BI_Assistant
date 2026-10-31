@@ -8,6 +8,9 @@ engine = create_engine(
     connect_args={"check_same_thread": False}
 )
 
+read_only_engine = create_engine(
+    "sqlite:///file:data/processed/sales.db?mode=ro&uri=true"
+)
 
 def save_data(data, table_name):
 

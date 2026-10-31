@@ -1,20 +1,55 @@
-from ingestion.csv_reader import read_csv_file
+import pandas as pd
+
 from ingestion.data_validator import validate_data
 
-data = read_csv_file("data/raw/sales.csv")
 
-errors = validate_data(data)
+def test_missing_values():
 
-print("Validation errors:", errors)
+    data = pd.DataFrame({
+        "Transaction_Id": ["TXN001", "TXN002"],
+        "Quantity": [2, 3],
+        "Unit_price": [100, None]
+    })
 
-print("\nRecords with missing unit price:")
-print(data[data["Unit_price"].isnull()])
+    errors = validate_data(data)
 
-print("\nRecords with invalid quantity:")
-print(data[data["Quantity"] <= 0])
+    assert "Missing values found" in errors
 
-print("\nTXN0051:")
-print(data[data["Transaction_Id"] == "TXN0051"].to_string(index=False))
 
-print("\nTXN0034:")
-print(data[data["Transaction_Id"] == "TXN0034"].to_string(index=False))
+def test_duplicate_transaction_ids():
+
+    data = pd.DataFrame({
+        "Transaction_Id": ["TXN001", "TXN001"],
+        "Quantity": [2, 3],
+        "Unit_price": [100, 200]
+    })
+
+    errors = validate_data(data)
+
+    assert "Duplicate transaction IDs found" in errors
+
+
+def test_invalid_quantity():
+
+    data = pd.DataFrame({
+        "Transaction_Id": ["TXN001", "TXN002"],
+        "Quantity": [2, 0],
+        "Unit_price": [100, 200]
+    })
+
+    errors = validate_data(data)
+
+    assert "Invalid quantity found" in errors
+
+
+def test_invalid_unit_price():
+
+    data = pd.DataFrame({
+        "Transaction_Id": ["TXN001", "TXN002"],
+        "Quantity": [2, 3],
+        "Unit_price": [100, 0]
+    })
+
+    errors = validate_data(data)
+
+    assert "Invalid unit price found" in errors
