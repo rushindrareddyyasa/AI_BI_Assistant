@@ -1,0 +1,2 @@
+Transaction_Id,Order_date,Product,Category,Region,Sales_channel,Quantity,Unit_price,Discount_amount,Status
+TXN0034,28-04-2026,Keyboard,Accessories,East,Online,0,900.0,0,Completed
