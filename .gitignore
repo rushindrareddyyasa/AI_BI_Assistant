@@ -30,3 +30,7 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Company assessment data
+data/raw/
+data/processed/
